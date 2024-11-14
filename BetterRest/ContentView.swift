@@ -14,6 +14,30 @@ struct ContentView: View {
     @State private var sleepAmount = 8.0
     @State private var coffeeAmount = 1
     
+    private var bedTime: Date {
+        
+        var sleepTime: Date = .now
+        
+        do {
+            let config = MLModelConfiguration()
+            let model = try SleepCalculator(configuration: config)
+            
+            let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+            let hour = (components.hour ?? 0) * 60 * 60
+            let minute = (components.minute ?? 0) * 60
+            
+            let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+            
+            sleepTime = wakeUp - prediction.actualSleep
+        
+        } catch {
+
+        }
+        
+        
+        return sleepTime
+    }
+    
     static var defaultWakeTime: Date {
         var components = DateComponents()
         components.hour = 8
@@ -64,12 +88,22 @@ struct ContentView: View {
 //                    Section("Daily coffee intake") {
 //                        Stepper("^[\(coffeeAmount) cup](inflect: true)", value: $coffeeAmount, in: 1...20)
 //                    }
+                    
+                    Section {
+                        VStack(alignment: .leading) {
+                            Text("Ideal Bedtime")
+                                .font(.headline)
+                            
+                            Text(bedTime, format: .dateTime.hour().minute())
+                        }
+                    }
                 }
                 .scrollContentBackground(.hidden)
             }
             .background(Color.mint.opacity(0.85).gradient)
             .navigationTitle("BetterRest")
             .navigationBarTitleDisplayMode(.inline)
+            /*
             .toolbar
             {
                 Button("Calculate", action: calculateBedtime)
@@ -79,6 +113,7 @@ struct ContentView: View {
             } message: {
                 Text(alertMessage)
             }
+             */
         }
         .preferredColorScheme(.dark)
     }
