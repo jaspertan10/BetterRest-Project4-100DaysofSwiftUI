@@ -53,8 +53,17 @@ struct ContentView: View {
                         Text("Daily coffee intake")
                             .font(.headline)
                         
-                        Stepper("^[\(coffeeAmount) cup](inflect: true)", value: $coffeeAmount, in: 1...20)
+                        //Stepper("^[\(coffeeAmount) cup](inflect: true)", value: $coffeeAmount, in: 1...20)
+                        Picker("Number of cups", selection: $coffeeAmount) {
+                            ForEach(1..<21) { num in
+                                Text("^[\(num) cup](inflect: true)")
+                            }
+                        }
                     }
+                    
+//                    Section("Daily coffee intake") {
+//                        Stepper("^[\(coffeeAmount) cup](inflect: true)", value: $coffeeAmount, in: 1...20)
+//                    }
                 }
                 .scrollContentBackground(.hidden)
             }
